@@ -1,5 +1,5 @@
 {
-	"URL" : "https://sample.com",
+	"URL" : "http://localhost:3001",
 	"PORT": 3001,
 	"ORIGIN": "*",
 	"mysql":{

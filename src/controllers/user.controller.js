@@ -1,12 +1,12 @@
 const UserVerification = require("../models/user.verification.model");
 const User = require("../models/user.model");
+const Workload = require("../models/user.workload");
 const config = require("../../config.json");
 const jwt = require('jsonwebtoken');
 const Bcrypt = require("bcryptjs");
 const secret = "kalvin-karl-secret-key";
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
-
 // Create transporter to nodemailer
 const transporter = nodemailer.createTransport({
 	service: "gmail",
@@ -26,7 +26,7 @@ transporter.verify((error,success) => {
 // Send verification
 const sendVerification = (user,res) => {
 	//url to be used in email
-	const currentUrl = config.url;
+	const currentUrl = config.URL;
 	const uniqueString = uuidv4();
 	const mailOptions = {
 		from: config.email.AUTH_EMAIL,
@@ -165,7 +165,7 @@ exports.register = (req,res) => {
 		username: req.body.username,
 		email: req.body.email,
 		password: Bcrypt.hashSync(req.body.password, 12),
-		role: 'ap',
+		role: 'u',
 	});
 	User.create(user, (error, result) => {
 		if (!error){
@@ -208,7 +208,7 @@ exports.resendVerification = (req, res) =>{
 				console.log("User is trying to resend verification while it is already verified.")
 			}
 		}else if (error === "NOT_FOUND"){
-			res.status(404).send({ message: "Failed sending verification, due to user email not found" })
+			res.status(404).send({ message: "Failed! user email not found" })
 		}else{
 			res.status(500).send({ message: "An error occured during the search of user email" })
 		}
@@ -300,4 +300,41 @@ exports.findByEmail = (req, res) => {
 			}
 		}
 	})
+}
+
+// THIS IS FOR MDB READER FILE
+// // Get the adodb module
+// var ADODB = require('node-adodb');
+// ADODB.debug = true;
+
+// // Connect to the MS Access DB
+// var connection = ADODB.open('Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\dbs\\database.accdb;Persist Security Info=False;');
+
+const ADODB = require('node-adodb');
+const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\\dbs\\dbWorkload.mdb;');
+exports.mdbr = async (req,res) => {
+	try {
+		const data = await connection.query("SELECT id,Campus,College,ClassCode,YR,Sect,Course,SubjectCode,Description,TotalUnits FROM tblWorkLoad");
+
+		Workload.createWorkload(data, (error, result) => {
+			if(!error){
+				res.status(200).send({ message: "New workload successfully created", data: data});
+			}else{
+				res.status(500).send({ message: "Some error occurred while creating the User.", error });
+			}
+		}); 
+
+	} catch (error) {
+		console.error(error);
+	}
+	
+	// // Query the DB
+	// connection
+	// 	.execute('SELECT * FROM tblTeachers')
+	// 	.then(data => {
+	// 	console.log(JSON.stringify(data, null, 2));
+	// })
+	// .catch(error => {
+	// 	console.error(error);
+	// });
 }

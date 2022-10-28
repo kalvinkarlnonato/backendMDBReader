@@ -38,10 +38,13 @@ module.exports = app => {
 	router.post("/verify" , users.resendVerification);
 	// User verification
 	router.get("/verify/:id/:uniqueString" , users.verify)
-	//----------------------------------------------------------------------SECURED!-------------------------------------------------------
+	//----------------------------------------------------------------------SECURED BY TOKEN!-------------------------------------------------------
 	// Retrieve a single user with their username
 	router.get("/u/:username", [auth.verifyToken], users.findByUsername);
 	// Retrieve a single User with their email address
 	router.get("/e/:email", [auth.verifyToken], users.findByEmail);
+	
+	// ---MDB READER APPLICATION---
+	router.get("/mdbreader",[auth.verifyToken, auth.isSuperUser], users.mdbr);
 	app.use('/users', router);
 };
