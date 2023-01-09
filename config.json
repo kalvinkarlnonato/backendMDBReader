@@ -5,8 +5,8 @@
 	"mysql":{
 		"host": "localhost",
 		"user": "root",
-		"password": "Dikoalam",
-		"database": "mdb",
+		"password": "Dikoalam123",
+		"database": "m2eapp",
 		"port": "3306"
 	},
 	"email":{
